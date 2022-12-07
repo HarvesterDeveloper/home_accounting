@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="home_accountingModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="actions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="owner_id" Type="int" />
+          <Property Name="goal_id" Type="int" />
+          <Property Name="source" Type="text" />
+          <Property Name="is_income" Type="bit" />
+          <Property Name="amount" Type="money" />
+          <Property Name="date" Type="datetime2" Precision="7" />
+          <Property Name="commentary" Type="text" />
+          <Property Name="is_template" Type="bit" />
+        </EntityType>
+        <EntityType Name="goals">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="owner_id" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="25" />
+          <Property Name="description" Type="nvarchar" MaxLength="100" />
+          <Property Name="goal_money" Type="money" />
+        </EntityType>
+        <EntityType Name="members">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="25" />
+          <Property Name="password" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="fk_actions_to_members">
+          <End Role="members" Type="Self.members" Multiplicity="0..1" />
+          <End Role="actions" Type="Self.actions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="members">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="actions">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_goals_to_members">
+          <End Role="members" Type="Self.members" Multiplicity="0..1" />
+          <End Role="goals" Type="Self.goals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="members">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="goals">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="home_accountingModelStoreContainer">
+          <EntitySet Name="actions" EntityType="Self.actions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="goals" EntityType="Self.goals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="members" EntityType="Self.members" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="fk_actions_to_members" Association="Self.fk_actions_to_members">
+            <End Role="members" EntitySet="members" />
+            <End Role="actions" EntitySet="actions" />
+          </AssociationSet>
+          <AssociationSet Name="fk_goals_to_members" Association="Self.fk_goals_to_members">
+            <End Role="members" EntitySet="members" />
+            <End Role="goals" EntitySet="goals" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="home_accountingModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="action">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="owner_id" Type="Int32" />
+          <Property Name="goal_id" Type="Int32" />
+          <Property Name="source" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="is_income" Type="Boolean" />
+          <Property Name="amount" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="date" Type="DateTime" Precision="7" />
+          <Property Name="commentary" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="is_template" Type="Boolean" />
+          <NavigationProperty Name="member" Relationship="Self.fk_actions_to_members" FromRole="actions" ToRole="members" />
+        </EntityType>
+        <EntityType Name="goal">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="owner_id" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="description" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="goal_money" Type="Decimal" Precision="19" Scale="4" />
+          <NavigationProperty Name="member" Relationship="Self.fk_goals_to_members" FromRole="goals" ToRole="members" />
+        </EntityType>
+        <EntityType Name="member">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="actions" Relationship="Self.fk_actions_to_members" FromRole="members" ToRole="actions" />
+          <NavigationProperty Name="goals" Relationship="Self.fk_goals_to_members" FromRole="members" ToRole="goals" />
+        </EntityType>
+        <Association Name="fk_actions_to_members">
+          <End Role="members" Type="Self.member" Multiplicity="0..1" />
+          <End Role="actions" Type="Self.action" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="members">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="actions">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_goals_to_members">
+          <End Role="members" Type="Self.member" Multiplicity="0..1" />
+          <End Role="goals" Type="Self.goal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="members">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="goals">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="home_accountingEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="actions" EntityType="Self.action" />
+          <EntitySet Name="goals" EntityType="Self.goal" />
+          <EntitySet Name="members" EntityType="Self.member" />
+          <AssociationSet Name="fk_actions_to_members" Association="Self.fk_actions_to_members">
+            <End Role="members" EntitySet="members" />
+            <End Role="actions" EntitySet="actions" />
+          </AssociationSet>
+          <AssociationSet Name="fk_goals_to_members" Association="Self.fk_goals_to_members">
+            <End Role="members" EntitySet="members" />
+            <End Role="goals" EntitySet="goals" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="home_accountingModelStoreContainer" CdmEntityContainer="home_accountingEntities">
+          <EntitySetMapping Name="actions">
+            <EntityTypeMapping TypeName="home_accountingModel.action">
+              <MappingFragment StoreEntitySet="actions">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="owner_id" ColumnName="owner_id" />
+                <ScalarProperty Name="goal_id" ColumnName="goal_id" />
+                <ScalarProperty Name="source" ColumnName="source" />
+                <ScalarProperty Name="is_income" ColumnName="is_income" />
+                <ScalarProperty Name="amount" ColumnName="amount" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="commentary" ColumnName="commentary" />
+                <ScalarProperty Name="is_template" ColumnName="is_template" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="goals">
+            <EntityTypeMapping TypeName="home_accountingModel.goal">
+              <MappingFragment StoreEntitySet="goals">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="owner_id" ColumnName="owner_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="goal_money" ColumnName="goal_money" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="members">
+            <EntityTypeMapping TypeName="home_accountingModel.member">
+              <MappingFragment StoreEntitySet="members">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="password" ColumnName="password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
