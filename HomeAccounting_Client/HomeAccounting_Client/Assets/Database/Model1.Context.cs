@@ -13,10 +13,10 @@ namespace HomeAccounting_Client.Assets.Database
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class home_accountingEntities1 : DbContext
+    public partial class home_accountingEntities : DbContext
     {
-        public home_accountingEntities1()
-            : base("name=home_accountingEntities1")
+        public home_accountingEntities()
+            : base("name=home_accountingEntities")
         {
         }
     

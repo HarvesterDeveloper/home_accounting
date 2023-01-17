@@ -12,15 +12,12 @@ namespace HomeAccounting_Client.Assets
     public static class Model
     {
         #region Variables
+
         private static String _CaptchaToUser = "";
         private static Boolean _CaptchaSolved = false;
         private static Int32 _UserId = -1;
-        private static home_accountingEntities1 _Database = null;
-        #endregion
+        private static home_accountingEntities _Database = null;
 
-        #region Properties
-        public static home_accountingEntities1 Database { get => _Database; }
-        public static Int32 UserId { get => _UserId; }
         #endregion
 
         #region Functions
@@ -31,7 +28,7 @@ namespace HomeAccounting_Client.Assets
         /// <returns></returns>
         public static String ConnectToDatabase()
         {
-            try { _Database = new home_accountingEntities1(); }
+            try { _Database = new home_accountingEntities(); }
             catch (Exception IncomeException) { return IncomeException.Message; }
             if (_Database == null) return "Ошибка подключения к бд"; else return "";
         }
@@ -46,7 +43,7 @@ namespace HomeAccounting_Client.Assets
         {
             member user = null;
 
-            try { user = Model.Database.members.SingleOrDefault(U => U.name == incomingLogin && U.password == incomingPassword);}
+            try { user = _Database.members.SingleOrDefault(U => U.name == incomingLogin && U.password == incomingPassword);}
             catch(Exception IncomeException) { return IncomeException.Message;}
             if (user == null) return "Указаны некорректные данные";
             else
@@ -136,8 +133,8 @@ namespace HomeAccounting_Client.Assets
                                     newUser.password = incomingPassword;
                                     try
                                     {
-                                        Model.Database.members.Add(newUser);
-                                        Model.Database.SaveChanges();
+                                        _Database.members.Add(newUser);
+                                        _Database.SaveChanges();
                                         _CaptchaSolved = false;
                                         return "";
                                     }
@@ -178,13 +175,33 @@ namespace HomeAccounting_Client.Assets
         }
 
         /// <summary>
+        /// This function returns List of logged user. If exception throws it returns null.
+        /// </summary>
+        /// <returns></returns>
+        public static List<action> GetUserActionsList()
+        {
+            List<action> functionResult = null;
+
+            try
+            {
+                functionResult = _Database.actions.Where(action => action.owner_id == _UserId).ToList();
+            }
+            catch(Exception exception)
+            {
+                //
+            }
+
+            return functionResult;
+        }
+
+        /// <summary>
         /// This function returns list of all reports in strings for current user.
         /// </summary>
         /// <returns></returns>
         public static List<String> GetUserReports()
         {
             List<String> functionResult = new List<String>();
-            List<action> userActions = _Database.actions.Where(action => action.owner_id == Model.UserId).ToList();
+            List<action> userActions = _Database.actions.Where(action => action.owner_id == _UserId).ToList();
             List<DateTime> availableMonths = new List<DateTime>();
 
             // searching available months
@@ -242,7 +259,7 @@ namespace HomeAccounting_Client.Assets
                     newReport += "Статистика по целям" + Environment.NewLine;
                     newReport += "------------------------------------------" + Environment.NewLine;
                     newReport += "Добавлено к целям: " + goalsIncome.ToString() + Environment.NewLine;
-                    foreach (goal gl in GetUserGoals())
+                    foreach (goal gl in GetUserGoalsList())
                     {
                         newReport += "Цель " + gl.name + "( " + gl.description + " ) выполнена на " + wastedOnGoals[gl.id].ToString() + "/" + gl.goal_money.ToString() + " ("+(wastedOnGoals[gl.id]/(gl.goal_money / 100)).ToString()+"%/100%)" + Environment.NewLine;
                     }
@@ -263,7 +280,7 @@ namespace HomeAccounting_Client.Assets
         /// This function returns goal class objects list of all user goals. If search failed it will return empty list.
         /// </summary>
         /// <returns></returns>
-        public static List<goal> GetUserGoals()
+        public static List<goal> GetUserGoalsList()
         {
             List<goal> functionResult = new List<goal>();
 
@@ -284,8 +301,28 @@ namespace HomeAccounting_Client.Assets
         public static List<String> GetUserGoalStringed()
         {
             List<String> functionResult = new List<String>();
-            List<goal> userGoals = GetUserGoals();
+            List<goal> userGoals = GetUserGoalsList();
             foreach (goal gl in userGoals) functionResult.Add(gl.id+"|"+gl.name);
+
+            return functionResult;
+        }
+
+        /// <summary>
+        /// This function returns goals with given Id. If excetpion throws it returns null.
+        /// </summary>
+        /// <returns></returns>
+        public static goal GetGoalById(Int32 incomingGoalId)
+        {
+            goal functionResult = null;
+
+            try
+            {
+                functionResult = _Database.goals.SingleOrDefault(relgoal => relgoal.id == incomingGoalId);
+            }
+            catch (Exception exception)
+            {
+                //
+            }
 
             return functionResult;
         }
@@ -313,8 +350,8 @@ namespace HomeAccounting_Client.Assets
 
             try
             {
-                Model.Database.actions.Add(newAction);
-                Model.Database.SaveChanges();
+                _Database.actions.Add(newAction);
+                _Database.SaveChanges();
             }
             catch (Exception ex) { return ex.Message; }
 
@@ -345,7 +382,7 @@ namespace HomeAccounting_Client.Assets
 
             try
             {
-                Model.Database.SaveChanges();
+                _Database.SaveChanges();
             }
             catch (Exception ex) { return ex.Message; }
 
@@ -369,8 +406,8 @@ namespace HomeAccounting_Client.Assets
 
             try
             {
-                Model.Database.goals.Add(newGoal);
-                Model.Database.SaveChanges();
+                _Database.goals.Add(newGoal);
+                _Database.SaveChanges();
                 return "";
             }
             catch(Exception exception)
@@ -381,10 +418,77 @@ namespace HomeAccounting_Client.Assets
             
         }
 
+        /// <summary>
+        /// This function deletes action from db. If exception throws its return exception message, if succes then return empty string;
+        /// </summary>
+        /// <param name="incomingAction"></param>
+        /// <returns></returns>
+        public static String DeleteAction(action incomingAction)
+        {
+            String functionResult = "";
+
+            try
+            {
+                _Database.actions.Remove(incomingAction);
+                _Database.SaveChanges();
+            }
+            catch(Exception exception)
+            {
+                functionResult = exception.Message;
+            }
+
+            return functionResult;
+        }
+
+        /// <summary>
+        /// This function puts given action in db. If exception throws its return exception message, if succes then return empty string;
+        /// </summary>
+        /// <param name="incomingAction"></param>
+        /// <returns></returns>
+        public static String PutAction(action incomingAction)
+        {
+            String functionResult = "";
+
+            try
+            {
+                _Database.actions.Add(incomingAction);
+                _Database.SaveChanges();
+            }
+            catch (Exception exception)
+            {
+                functionResult = exception.Message;
+            }
+
+            return functionResult;
+        }
+
+        /// <summary>
+        /// This function deletes goal from db. If exception throws its return exception message, if succes then return empty string;
+        /// </summary>
+        /// <param name="incomingGoal"></param>
+        /// <returns></returns>
+        public static String DeleteGoal(goal incomingGoal)
+        {
+            String functionResult = "";
+
+            try
+            {
+                _Database.goals.Remove(incomingGoal);
+                _Database.SaveChanges();
+            }
+            catch (Exception exception)
+            {
+                functionResult = exception.Message;
+            }
+
+            return functionResult;
+        }
+
         #endregion
     }
 
     #region Converters
+
     public class IncomeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -419,7 +523,7 @@ namespace HomeAccounting_Client.Assets
 
             if(incomingId > -1)
             {
-                goal relatedGoal = Model.Database.goals.SingleOrDefault(relgoal => relgoal.id == incomingId);
+                goal relatedGoal = Model.GetGoalById(incomingId);
                 if (relatedGoal != null) return relatedGoal.name; else return "Нет";
 
             }

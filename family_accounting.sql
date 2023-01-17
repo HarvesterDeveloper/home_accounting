@@ -1,7 +1,7 @@
 USE [master]
 GO
-/*CREATE DATABASE [home_accounting] ON PRIMARY ( NAME = N'home_accounting', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.SQLEXPRESS\MSSQL\DATA\home_accounting.mdf') COLLATE Cyrillic_General_CI_AS*/
-CREATE DATABASE [home_accounting] ON PRIMARY ( NAME = N'home_accounting', FILENAME = N'D:\MSSQL\home_accounting.mdf') COLLATE Cyrillic_General_CI_AS
+CREATE DATABASE [home_accounting] ON PRIMARY ( NAME = N'home_accounting', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.SQLEXPRESS\MSSQL\DATA\home_accounting.mdf') COLLATE Cyrillic_General_CI_AS
+/*CREATE DATABASE [home_accounting] ON PRIMARY ( NAME = N'home_accounting', FILENAME = N'D:\MSSQL\home_accounting.mdf') COLLATE Cyrillic_General_CI_AS*/
 GO
 
 USE [home_accounting]

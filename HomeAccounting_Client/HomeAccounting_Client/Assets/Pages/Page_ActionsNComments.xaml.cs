@@ -10,6 +10,7 @@ namespace HomeAccounting_Client.Assets.Pages
     public partial class Page_ActionsNComments : Page
     {
         private List<action> _Actions = null;
+
         public Page_ActionsNComments()
         {
             InitializeComponent();
@@ -19,7 +20,7 @@ namespace HomeAccounting_Client.Assets.Pages
 
         public void RefreshList()
         {
-            _Actions = Model.Database.actions.Where(action => action.owner_id == Model.UserId).ToList();
+            _Actions = Model.GetUserActionsList();
             DataGrid_Main.ItemsSource = _Actions;
         }
 
@@ -34,8 +35,7 @@ namespace HomeAccounting_Client.Assets.Pages
         {
             if(DataGrid_Main.SelectedIndex > -1)
             {
-                Model.Database.actions.Remove(_Actions[DataGrid_Main.SelectedIndex]);
-                Model.Database.SaveChanges();
+                Model.DeleteAction(_Actions[DataGrid_Main.SelectedIndex]);
                 RefreshList();
             }
         }
@@ -44,8 +44,7 @@ namespace HomeAccounting_Client.Assets.Pages
         {
             if (DataGrid_Main.SelectedIndex > -1)
             {
-                Model.Database.actions.Add(_Actions[DataGrid_Main.SelectedIndex]);
-                Model.Database.SaveChanges();
+                Model.PutAction(_Actions[DataGrid_Main.SelectedIndex]);
                 RefreshList();
             }
         }

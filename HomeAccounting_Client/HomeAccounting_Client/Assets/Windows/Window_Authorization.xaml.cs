@@ -49,7 +49,7 @@ namespace HomeAccounting_Client
 
             if (authorizationResult == "")
             {
-                Console.WriteLine("Вы вошли в аккаунт с id " + Model.UserId.ToString(), "Успешный вход");
+                Console.WriteLine("Вход выполнен ", "Успешный вход");
                 Window_MainMenu windowMenu = new Window_MainMenu();
                 windowMenu.Show();
                 Close();

@@ -20,7 +20,7 @@ namespace HomeAccounting_Client.Assets.Pages
 
         public void RefreshList()
         {
-            _Goals = Model.Database.goals.Where(goal => goal.owner_id == Model.UserId).ToList();
+            _Goals = Model.GetUserGoalsList();
             DataGrid_Main.ItemsSource = _Goals;
         }
 
@@ -33,8 +33,7 @@ namespace HomeAccounting_Client.Assets.Pages
 
         private void ButtonClick_Delete(object sender, RoutedEventArgs e)
         {
-            Model.Database.goals.Remove(_Goals[DataGrid_Main.SelectedIndex]);
-            Model.Database.SaveChanges();
+            Model.DeleteGoal(_Goals[DataGrid_Main.SelectedIndex]);
             RefreshList();
         }
     }
