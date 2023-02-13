@@ -18,7 +18,17 @@ namespace HomeAccounting_Client.Assets.Windows
 
         private void ButtonClick_Update(object sender, RoutedEventArgs e)
         {
-            String updateResult = Model.UpdateAction(ActionId, Int32.Parse(ComboBox_Goals.Items.GetItemAt(ComboBox_Goals.SelectedIndex).ToString().Split(new char[] { '|' })[0]), TextBox_Source.Text, (Boolean)CheckBox_IsIncome.IsChecked, Decimal.Parse(TextBox_Amount.Text), DateTime.Parse(TextBox_Datetime.Text), TextBox_Commentary.Text);
+            String updateResult = "";
+
+            if(ComboBox_Goals.SelectedIndex != -1)
+            {
+                updateResult = Model.UpdateAction(ActionId, Int32.Parse(ComboBox_Goals.Items.GetItemAt(ComboBox_Goals.SelectedIndex).ToString().Split(new char[] { '|' })[0]), TextBox_Source.Text, (Boolean)CheckBox_IsIncome.IsChecked, Decimal.Parse(TextBox_Amount.Text), DateTime.Parse(TextBox_Datetime.Text), TextBox_Commentary.Text);
+            }
+            else
+            {
+                updateResult = Model.UpdateAction(ActionId, ComboBox_Goals.SelectedIndex, TextBox_Source.Text, (Boolean)CheckBox_IsIncome.IsChecked, Decimal.Parse(TextBox_Amount.Text), DateTime.Parse(TextBox_Datetime.Text), TextBox_Commentary.Text);
+
+            }
 
             if (updateResult == "") { Context.RefreshList(); Close(); } else MessageBox.Show(updateResult, "Ошибка");
         }
